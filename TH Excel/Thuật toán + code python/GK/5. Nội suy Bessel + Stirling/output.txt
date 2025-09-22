@@ -1,0 +1,37 @@
+
+
+Moc noi suy ban dau duoc chon la: (3.0, 1.0)
+
+--------------------------------------------------------------------------------------
+Da thuc moi sau khi them moc 2 noi suy: (4.0, 2.0); (2.0, 0.8) 
+Tap cac moc noi suy: 	(3.0, 1.0); 	(4.0, 2.0); 	(2.0, 0.8); 	
+Da thuc bac 2: 
+P(t) =: 0.4 * x^2 	 + 	0.6 * x^1 	 + 	1.0 * x^0 	 + 	
+
+Thu lai
+
+Tai du lieu x = 3.0
+Pn(x) - y = 0.0
+Tai du lieu x = 4.0
+Pn(x) - y = 0.0
+Tai du lieu x = 2.0
+Pn(x) - y = 0.0
+
+--------------------------------------------------------------------------------------
+Da thuc moi sau khi them moc 2 noi suy: (5.0, 3.0); (6.0, 4.0) 
+Tap cac moc noi suy: 	(3.0, 1.0); 	(4.0, 2.0); 	(2.0, 0.8); 	(5.0, 3.0); 	(6.0, 4.0); 	
+Da thuc bac 4: 
+P(t) =: -0.17500000000000002 * x^4 	 + 	-0.31666666666666665 * x^3 	 + 	0.5750000000000001 * x^2 	 + 	0.9166666666666666 * x^1 	 + 	1.0 * x^0 	 + 	
+
+Thu lai
+
+Tai du lieu x = 3.0
+Pn(x) - y = 0.0
+Tai du lieu x = 4.0
+Pn(x) - y = 0.0
+Tai du lieu x = 2.0
+Pn(x) - y = 0.0
+Tai du lieu x = 5.0
+Pn(x) - y = -3.2
+Tai du lieu x = 6.0
+Pn(x) - y = -17.799999999999997
