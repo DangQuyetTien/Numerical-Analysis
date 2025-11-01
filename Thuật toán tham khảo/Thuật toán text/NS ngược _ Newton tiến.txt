@@ -1,0 +1,99 @@
+Thuật toán Nội suy Newton Ngược P(y) - ĐTNS Tiến
+Input
+	Mảng y[] chứa các mốc dữ liệu
+	Mảng x[] chứa giá trị tương ứng
+Output
+	Mảng p[] chứa hệ số đa thức P(y) theo thứ tự [an, an-1, ..., a0]
+
+Bước 1: Check điều kiện Input
+	Kiểm tra:
+		Độ dài y[] và x[] có bằng nhau không → nếu không dừng
+		Kiểm tra y[] có cách đều không:
+			h = y[1] - y[0]
+			isEquidistant = True
+				For i = 1 to len(y) - 1:
+    I				f y[i] - y[i-1] ≠ h:
+					isEquidistant = False
+			break
+Bước 2: Khởi tạo các biến và mảng
+
+	n = len(y) - 1
+	d[][] = mảng (n+1) x (n+1) số 0  // bảng sai phân / tỉ sai phân
+	p[] = mảng n+1 số 0               // mảng hệ số kết quả
+	w[] = mảng 1 phần tử [1]          // mảng phụ cho xây dựng đa thức
+Bước 3: Xử lý dựa trên kết quả kiểm tra
+Nếu y[] cách đều → Dùng NEWTON TIẾN MỐC CÁCH ĐỀU (Thực hiện 3a, 3b)
+Nếu y[] không cách đều → Dùng NEWTON MỐC BẤT KỲ (Thực hiện 3c, 3d)
+Bước 3a: Lập bảng sai phân
+
+	For i = 0 to n:
+		d[i][0] = x[i]
+
+	For j = 1 to n:
+		For i = n-j downto 0:
+			d[i][j] = d[i+1][j-1] - d[i][j-1]
+Bước 3b: Xây dựng đa thức Newton tiến
+
+	p[0] = d[0][0]
+
+	For i = 1 to n:
+		c = d[0][i] / fact(i)
+    
+		// Nhân w với (t - y[0+(i-1)]) = (t - y[i-1])
+		w = nhan(w, [-y[i-1], 1])
+    
+		For j = 0 to len(w) - 1:
+			p[j] = p[j] + c * w[j]
+
+Bước 3c: Lập bảng tỉ sai phân
+
+	For i = 0 to n:
+		d[i][0] = x[i]
+
+	For j = 1 to n:
+		For i = n downto j:
+			d[i][j] = (d[i][j-1] - d[i-1][j-1]) / (y[i] - y[i-j])
+Bước 3d: Xây dựng đa thức Newton tiến mốc bất kỳ
+
+	p[0] = d[n][0]
+
+	For i = 1 to n:
+		c = d[n][i]
+    
+		// Nhân w với (t - y[n-i])
+		w = nhan(w, [-y[n-i], 1])
+    
+		For j = 0 to len(w) - 1:
+			p[j] = p[j] + c * w[j]
+Bước 4: Đảo ngược mảng hệ số
+daonguoc(p)
+Bước 5: Return p
+
+Các hàm phụ
+
+Hàm nhan(b[], c[])
+Nhân hai đa thức b[] và c[]
+
+	n1 = len(b)
+	n2 = len(c)
+	a[] = mảng (n1 + n2 - 1) số 0
+	
+	For i = 0 to n1 - 1:
+		For j = 0 to n2 - 1:
+			a[i + j] = a[i + j] + b[i] * c[j]
+
+	Return a
+
+
+Hàm daonguoc(a[])
+Đảo ngược mảng
+
+
+	n = len(a)
+	For i = 0 to n/2 - 1:
+		swap(a[i], a[n - 1 - i])
+Hàm tính giai thừa (dùng cho phương pháp cách đều)
+
+	fact(k):
+		if k ≤ 1: return 1
+		else: return k * fact(k-1)

@@ -1,0 +1,88 @@
+Thuật toán Gauss II - Tổng hợp
+Input: x[], y[]
+Output: Mảng p[] chứa hệ số của đa thức nội suy theo thứ tự [an, an-1, ..., a0]
+Bước 1: Check input
+    + Mốc trùng -> bỏ 1 mốc
+    + x[] cách đều chưa? nếu chưa -> dừng
+    
+Bước 2: Khởi tạo
+    n = len(y[]) - 1
+    h = x[1] - x[0]
+    if (n < 1): Stop
+    
+Bước 3: Thiết lập bảng sai phân
+    d[][] = mảng (n+1) × (n+1) chứa 0
+    For i = 0 to n:
+        d[i][0] = y[i]
+    For j = 1 to n:
+        For i = 0 to (n - j):
+            d[i][j] = d[i+1][j-1] - d[i][j-1]
+    
+Bước 4: Điểm trung tâm
+    k = floor((n + 1) / 2)
+    x0 = x[k]
+    
+Bước 5: Xây dựng đa thức theo t
+    a[] = [d[k][0]]
+    q[] = [1]
+    f = 1
+    
+    For i = 1 to n:
+        If (i % 2 == 1):
+            q[] = nhan(q[], [(i-1), 1])
+        Else:
+            q[] = nhan(q[], [-i/2, 1])
+        
+        f = f * i
+        
+        If (i % 2 == 0):
+            idx = k - (i/2)
+        Else:
+            idx = k - ((i-1)/2)
+        
+        If (idx >= 0 AND idx <= n - i):
+            c = d[idx][i] / f
+            For j = 0 to len(q[]) - 1:
+                a[j] = a[j] + c * q[j]
+    
+Bước 6: Chuyển t sang x
+    u[] = [-x0/h, 1/h]
+    p[] = [0]
+    
+    For i = 0 to len(a[]) - 1:
+        w[] = [1]
+        For j = 1 to i:
+            w[] = nhan(w[], u[])
+        
+        For j = 0 to len(w[]) - 1:
+            w[j] = w[j] * a[i]
+        
+        p[] = cong(p[], w[])
+    
+Bước 7: Đảo ngược
+    dao_nguoc(p[])
+    Return p[]
+
+
+Gói nhan(b[], c[]):
+    n1 = len(b[])
+    n2 = len(c[])
+    a[] = mảng (n1 + n2 - 1) số 0
+    For i = 0 to n1 - 1:
+        For j = 0 to n2 - 1:
+            a[i + j] = a[i + j] + b[i] * c[j]
+    Return a[]
+
+Gói cong(b[], c[]):
+    n = max(len(b[]), len(c[]))
+    a[] = mảng n số 0
+    For i = 0 to len(b[]) - 1:
+        a[i] = a[i] + b[i]
+    For i = 0 to len(c[]) - 1:
+        a[i] = a[i] + c[i]
+    Return a[]
+
+Gói dao_nguoc(a[]):
+    n = len(a[])
+    For i = 0 to n/2 - 1:
+        swap(a[i], a[n - 1 - i])

@@ -1,0 +1,114 @@
+Thuật toán Stirling - Tổng hợp (Stirling Central Difference Interpolation)
+Input: x[], y[]
+Output: Mảng p[] chứa hệ số của đa thức nội suy theo thứ tự [an, an-1, ..., a0]
+Bước 1: Check input
+    + Mốc trùng -> bỏ 1 mốc
+    + x[] cách đều chưa? nếu chưa -> dừng
+    
+Bước 2: Khởi tạo
+    n = len(y[]) - 1
+    h = x[1] - x[0]
+    if (n < 1): Stop
+    
+Bước 3: Thiết lập bảng sai phân
+    d[][] = mảng (n+1) × (n+1) chứa 0
+    For i = 0 to n:
+        d[i][0] = y[i]
+    For j = 1 to n:
+        For i = 0 to (n - j):
+            d[i][j] = d[i+1][j-1] - d[i][j-1]
+    
+Bước 4: Điểm trung tâm
+    k = floor(n / 2)
+    x0 = x[k]
+    
+Bước 5: Xây dựng đa thức theo t
+    //Công thức Stirling kết hợp cả hai (Gauss I và Gauss II)
+    a[] = [d[k][0]]
+    q[] = [1]
+    f = 1
+    
+    For i = 1 to n:
+        // Tính trung bình các hệ số từ Gauss I và Gauss II
+        If (i % 2 == 1):
+            // Bậc lẻ: trung bình của (-(i-1)) và ((i-1))
+            // Gauss I: q[] = nhan(q[], [-(i-1), 1])
+            // Gauss II: q[] = nhan(q[], [(i-1), 1])
+            // Trung bình: coefficient = 0
+            q[] = nhan(q[], [0, 1])
+            coeff_idx_1 = k - ((i+1)/2)
+            coeff_idx_2 = k - ((i-1)/2)
+        Else:
+            // Bậc chẵn: trung bình của (i/2) và (-i/2)
+            // Gauss I: q[] = nhan(q[], [i/2, 1])
+            // Gauss II: q[] = nhan(q[], [-i/2, 1])
+            // Nhân với t theo cách đặc biệt cho Stirling
+            q[] = nhan(q[], [0, 1])
+            coeff_idx = k - (i/2)
+        
+        f = f * i
+        
+        If (i % 2 == 1):
+            // Sai phân bậc lẻ sử dụng trung bình
+            If (coeff_idx_1 >= 0 AND coeff_idx_1 <= n - i):
+                c1 = d[coeff_idx_1][i]
+            Else:
+                c1 = 0
+            
+            If (coeff_idx_2 >= 0 AND coeff_idx_2 <= n - i):
+                c2 = d[coeff_idx_2][i]
+            Else:
+                c2 = 0
+            
+            c = (c1 + c2) / (2 * f)
+        Else:
+            // Sai phân bậc chẵn
+            If (coeff_idx >= 0 AND coeff_idx <= n - i):
+                c = d[coeff_idx][i] / f
+            Else:
+                c = 0
+        
+        For j = 0 to len(q[]) - 1:
+            a[j] = a[j] + c * q[j]
+    
+Bước 6: Chuyển t sang x
+    u[] = [-x0/h, 1/h]
+    p[] = [0]
+    
+    For i = 0 to len(a[]) - 1:
+        w[] = [1]
+        For j = 1 to i:
+            w[] = nhan(w[], u[])
+        
+        For j = 0 to len(w[]) - 1:
+            w[j] = w[j] * a[i]
+        
+        p[] = cong(p[], w[])
+    
+Bước 7: Đảo ngược
+    dao_nguoc(p[])
+    Return p[]
+
+
+Gói nhan(b[], c[]):
+    n1 = len(b[])
+    n2 = len(c[])
+    a[] = mảng (n1 + n2 - 1) số 0
+    For i = 0 to n1 - 1:
+        For j = 0 to n2 - 1:
+            a[i + j] = a[i + j] + b[i] * c[j]
+    Return a[]
+
+Gói cong(b[], c[]):
+    n = max(len(b[]), len(c[]))
+    a[] = mảng n số 0
+    For i = 0 to len(b[]) - 1:
+        a[i] = a[i] + b[i]
+    For i = 0 to len(c[]) - 1:
+        a[i] = a[i] + c[i]
+    Return a[]
+
+Gói dao_nguoc(a[]):
+    n = len(a[])
+    For i = 0 to n/2 - 1:
+        swap(a[i], a[n - 1 - i])

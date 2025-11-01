@@ -1,0 +1,93 @@
+Thuật toán Xây dựng Đa thức Nội suy Ngược P(y) sử dụng Phương pháp Lagrange
+Input:
+	Mảng y[] chứa các mốc dữ liệu
+	Mảng x[] chứa giá trị tương ứng
+Output:
+	Mảng p[] chứa hệ số đa thức P(y) theo thứ tự [an, an-1, ..., a0]
+
+Bước 1: Check điều kiện Input
+	Kiểm tra độ dài y[] và x[] có bằng nhau không, nếu không dừng
+	Kiểm tra y[] có cách đều không:
+		h = y[1] - y[0]
+		isEquidistant = True
+		For i = 1 to len(y) - 1:
+			If y[i] - y[i-1] ≠ h:
+				isEquidistant = False
+				break
+	Kiểm tra có phần tử trùng lặp trong y[] không:
+		For i = 0 to len(y) - 1:
+			For j = i + 1 to len(y) - 1:
+				If y[i] == y[j]:
+					báo lỗi "y[] có phần tử trùng lặp"
+					break
+	Xử lý điều kiện biên: nếu kiểm tra thất bại thì dừng
+
+Bước 2: Khởi tạo các biến, mảng trung gian
+	n = len(y) - 1
+	p[] = mảng n+1 số 0 chứa hệ số đa thức kết quả
+	den[] = mảng n+1 số 0 chứa mẫu số của các đa thức Lagrange
+	w[] = mảng 1 phần tử [1] dùng để tính tích các nhân tử
+	h = khoảng cách giữa các mốc (nếu cách đều)
+
+Bước 3: Xử lý dựa trên kết quả kiểm tra
+	Nếu isEquidistant = True thực hiện 3a, 3b (Lagrange mốc cách đều)
+	Nếu isEquidistant = False thực hiện 3c, 3d (Lagrange mốc bất kỳ)
+
+Bước 3a: Lagrange mốc cách đều - Tính mẫu số với công thức t
+	h = y[1] - y[0]
+	For i = 0 to n:
+		den[i] = 1
+		For j = 0 to n:
+			If i ≠ j:
+				den[i] = den[i] * (i - j)
+		den[i] = den[i] * (h ^ n)
+
+Bước 3b: Lagrange mốc cách đều - Xây dựng đa thức với biến t = (y - y0) / h
+	For i = 0 to n:
+		t_coeff[] = [1]
+		For j = 0 to n:
+			If i ≠ j:
+				t_coeff[] = nhan(t_coeff[], [-(y[0] + j*h), 1])
+		For k = 0 to len(t_coeff[]) - 1:
+			coeff = t_coeff[k] / den[i]
+			p[k] = p[k] + x[i] * coeff
+	Chuyển đổi từ biến t sang y: u = (y - y0) / h, sau đó áp dụng đổi biến
+	daonguoc(p)
+	Return p
+
+Bước 3c: Lagrange mốc bất kỳ - Tính mẫu số
+	For i = 0 to n:
+		den[i] = 1
+		For j = 0 to n:
+			If i ≠ j:
+				den[i] = den[i] * (y[i] - y[j])
+
+Bước 3d: Lagrange mốc bất kỳ - Xây dựng đa thức Lagrange tổng quát
+	For i = 0 to n:
+		w[] = [1]
+		For j = 0 to n:
+			If i ≠ j:
+				w[] = nhan(w[], [-y[j], 1])
+		For k = 0 to len(w[]) - 1:
+			coeff = w[k] / den[i]
+			p[k] = p[k] + x[i] * coeff
+	daonguoc(p)
+	Return p
+
+Hàm nhan(b[], c[])
+	Nhân hai đa thức b[] và c[]
+	n1 = len(b)
+	n2 = len(c)
+	a[] = mảng (n1 + n2 - 1) số 0
+	For i = 0 to n1 - 1:
+		For j = 0 to n2 - 1:
+			a[i + j] = a[i + j] + b[i] * c[j]
+	Return a
+
+Hàm daonguoc(a[])
+	Đảo ngược mảng hệ số từ thấp sang cao
+	n = len(a)
+	For i = 0 to n/2 - 1:
+		swap(a[i], a[n - 1 - i])
+
+Các gói (package) sử dụng: Không cần gói ngoài, chỉ sử dụng các phép toán số học cơ bản và cấu trúc mảng
