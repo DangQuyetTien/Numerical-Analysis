@@ -1,0 +1,47 @@
+Thuật toán Hàm ghép trơn cấp 3 (Spline bậc 3 chi tiết theo flowchart)
+
+Input:
+    Mảng x[] chứa n+1 mốc nội suy
+    Mảng y[] chứa n+1 giá trị
+    Các điều kiện biên: f'(a), f'(b) nếu dùng spline ghép có đạo hàm đầu cuối
+Output:
+    Mảng hệ số a0, a1, a2, a3 cho mỗi đoạn [x_i, x_{i+1}]
+
+Bước 1: Kiểm tra trùng mốc
+    Nếu tồn tại x[i] = x[j] với i ≠ j thì xóa mốc trùng hoặc dừng
+
+Bước 2: Khởi tạo
+    n = len(x) - 1
+    h[i] = x[i+1] - x[i] với i = 0..n-1
+    lambda_0 = 1, mu_0 = 0, d_0 = 0
+    lambda_n = 0, mu_n = 1, d_n = 0
+
+Bước 3: Tính các tham số ở mỗi mốc nội suy
+    For i = 1 to n-1:
+        lambda[i] = h[i] / (h[i-1] + h[i])
+        mu[i] = 1 - lambda[i]
+        d[i] = 6 / (h[i-1] + h[i]) * ( (y[i+1] - y[i])/h[i] - (y[i] - y[i-1])/h[i-1] )
+
+Bước 4: Giải hệ phương trình chính để xác định m[i]
+    Lập hệ:
+        2*mu_0*m[0] + lambda_0*m[1] = 6/h[0] * (y[1]-y[0]) - f'(a)        // nếu cho biết đạo hàm tại đầu trái
+        mu[i]*m[i-1] + 2*m[i] + lambda[i]*m[i+1] = d[i]   với i = 1..n-1
+        mu_n*m[n-1] + 2*m[n]*m[n] = 6/h[n-1]*(f'(b) - (y[n] - y[n-1])/h[n-1]) // nếu cho biết đạo hàm tại đầu phải
+    Giải hệ bậc thang này để lấy m[i] với i = 0..n
+
+Bước 5: Tính các hệ số phi và theta cho mỗi đoạn
+    For i = 0 đến n-1:
+        phi[i] = y[i+1]/h[i] - m[i+1]*h[i]/6
+        theta[i] = y[i]/h[i] - m[i]*h[i]/6
+
+Bước 6: Tính hệ số đa thức từng đoạn [x_i, x_{i+1}]
+    For i = 0 đến n-1:
+        a3 = (m[i+1] - m[i])/(6*h[i])
+        a2 = m[i]/2
+        a1 = phi[i] - theta[i]
+        a0 = theta[i]
+
+Bước 7: In ra hệ số đa thức trên mỗi đoạn
+    Với mỗi đoạn [x_i, x_{i+1}], xuất các hệ số đa thức vừa tính
+
+Kết thúc

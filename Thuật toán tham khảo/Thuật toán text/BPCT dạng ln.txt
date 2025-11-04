@@ -1,0 +1,27 @@
+Thuật toán bình phương cực tiểu dạng y = ln(...)
+
+Input:
+    Nhập giá trị x[], y[], phi[] (n điểm)
+Output:
+    a[]: các hệ số bình phương cực tiểu cho hàm xấp xỉ y = ln( a0*phi0(x) + ... + am*phim(x) )
+
+Bước 1: Xây dựng ma trận M cho dữ liệu thực nghiệm
+    For i = 0 đến n-1:
+        For j = 0 đến m:
+            M[i][j] = phi[j](x[i])
+
+Bước 2: Xây dựng vector Y cho mô hình logarit
+    For i = 0 đến n-1:
+        Y[i] = ln(y[i])
+
+Bước 3: Thiết lập ma trận phép chiếu
+    Tính M_T = chuyển vị của M
+    Tính A = M_T * M
+    Tính B = M_T * Y
+
+Bước 4: Giải hệ tuyến tính A*a = B
+    a[] = (M_T*M)^{-1} * (M_T*Y)
+
+Bước 5: Xuất hệ số a[] là nghiệm bình phương cực tiểu cho mô hình logarit
+
+Kết thúc

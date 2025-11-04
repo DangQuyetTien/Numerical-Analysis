@@ -1,0 +1,32 @@
+Thuật toán Hàm ghép trơn cấp 1 (Spline bậc 1 - chi tiết notation m, phi, theta, lambda, mu):
+
+Input:
+    Mảng x[] chứa n+1 mốc nội suy
+    Mảng y[] chứa n+1 giá trị
+Output:
+    Hệ số a0, a1 cho mỗi đoạn [x_i, x_{i+1}]
+
+Bước 1: Kiểm tra trùng mốc
+    Nếu tồn tại x[i] = x[j] với i ≠ j thì xóa mốc trùng hoặc dừng
+
+Bước 2: Khởi tạo
+    n = len(x) - 1
+    h[i] = x[i+1] - x[i] với i = 0..n-1
+
+Bước 3: Tính các biến nội suy phi, theta, m
+    For i = 0 đến n-1:
+        // Mốc đầu đoạn
+        phi[i] = y[i]        // phi là giá trị tại x_i
+        theta[i] = y[i+1]    // theta là giá trị tại x_i+1
+        m[i] = (y[i+1] - y[i]) / h[i]    // độ dốc đoạn [x_i, x_{i+1}]
+        lambda[i] = h[i] / (h[i] + h[i]) // = 0.5 nếu đều nhau (không ảnh hưởng tới đoạn thẳng)
+        mu[i] = 1 - lambda[i]
+
+Bước 4: Tính hệ số a0, a1 cho từng đoạn [x_i, x_{i+1}]
+    a0 = y[i]
+    a1 = (y[i+1] - y[i]) / h[i]
+
+Bước 5: Xuất đa thức cho từng đoạn
+    S_i(x) = a0 + a1*(x - x_i) với x thuộc [x_i, x_{i+1}]
+
+Kết thúc

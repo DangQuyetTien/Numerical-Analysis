@@ -1,0 +1,29 @@
+Thuật toán bình phương cực tiểu tuyến tính của hàm số (bám sát lược đồ trong ảnh)
+
+Input:
+    Nhập các giá trị x[], y[] (bộ dữ liệu thực nghiệm, n điểm)
+    Nhập các hàm cơ sở phi[] (phi0, phi1, ..., phim)
+
+Output:
+    a[]: hệ số của mô hình hồi quy cực tiểu
+
+Bước 1: Xây dựng ma trận M chứa các giá trị phi tại từng mốc
+    M là ma trận n hàng, m+1 cột
+    For i = 0 đến n-1:
+        For j = 0 đến m:
+            M[i][j] = phi[j](x[i])
+
+Bước 2: Lưu vector giá trị y[] (cột đáp ứng)
+
+Bước 3: Tính toán các ma trận phụ trợ
+    Tính M_T = chuyển vị của ma trận M
+    Tính ma trận hệ số phụ: A = M_T * M
+    Tính vector phụ: B = M_T * Y, với Y là vector giá trị y[]
+
+Bước 4: Giải hệ tuyến tính
+    a[] = nghịch đảo của A nhân với B
+    a[] = (M_T * M)^{-1} * (M_T * Y)
+
+Bước 5: Xuất nghiệm a[] là hệ số cực tiểu tìm được cho hàm hồi quy
+
+Kết thúc

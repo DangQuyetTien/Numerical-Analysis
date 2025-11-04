@@ -1,0 +1,35 @@
+Thuật toán bình phương cực tiểu dạng y = a*e^{...} (bám sát lược đồ trong ảnh)
+
+Input:
+    Nhập giá trị x[], y[] và phi[]
+Output:
+    a[]: hệ số của mô hình hồi quy cực tiểu
+
+Bước 1: Xây dựng ma trận M chứa giá trị phi tại từng mốc
+    For i = 0 đến n-1:
+        For j = 0 đến m:
+            M[i][j] = phi[j](x[i])
+    a[] = mảng lưu hệ số
+
+Bước 2: Kiểm tra dấu các y[i]
+    Nếu mọi y[i] > 0: 
+        Y[i] = ln(y[i]) với mọi i, sgn = 1
+    Nếu mọi y[i] < 0:
+        Y[i] = ln(-y[i]) với mọi i, sgn = -1
+    Nếu y[] chứa cả số dương lẫn âm: input không thỏa mãn, kết thúc
+
+Bước 3: Thiết lập ma trận cho bài toán cực tiểu
+    Tính M_T = chuyển vị của ma trận M
+    Tính A = M_T * M
+    Tính B = M_T * Y
+
+Bước 4: Giải hệ A*a = B
+    a[] = (M_T * M)^(-1) * (M_T * Y)
+
+Bước 5: Hiệu chỉnh hệ số tự do a0 (nếu có)
+    Nếu thuật toán hồi quy logarit (hàm mũ), tính lại hằng số tự do:
+        a0 = sgn * exp(a0)
+
+Bước 6: Xuất nghiệm a[] là hệ số cực tiểu tìm được cho bài toán
+
+Kết thúc

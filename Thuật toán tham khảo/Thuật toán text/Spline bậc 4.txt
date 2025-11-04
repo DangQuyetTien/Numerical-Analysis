@@ -1,0 +1,51 @@
+Thuật toán Hàm ghép trơn cấp 4 (Spline bậc 4 - notation đầy đủ lambda, mu, phi, theta, m):
+
+Input:
+    Mảng x[] chứa n+1 mốc nội suy
+    Mảng y[] chứa n+1 giá trị
+    Mảng y1[] (hoặc phi[]): đạo hàm bậc 1 tại các mốc (nếu có)
+    Mảng y2[] (hoặc m[]): đạo hàm bậc 2 tại các mốc (nếu có)
+Output:
+    Hệ số a0, a1, a2, a3, a4 cho mỗi đoạn [x_i, x_{i+1}]
+
+Bước 1: Kiểm tra trùng mốc
+    Nếu tồn tại x[i] = x[j] với i ≠ j thì xóa hoặc báo lỗi
+
+Bước 2: Khởi tạo và tính các tham số
+    n = len(x) - 1
+    h[]: mảng n số thực, h[i] = x[i+1] - x[i] với i = 0..n-1
+    m[]: mảng n+1 hệ số ghép trơn (dựng từ đạo hàm cấp 2, hoặc tính từ hệ tam trùng)
+
+Bước 3: Tính lambda, mu, d (nếu muốn nội suy khớp đạo hàm cao)
+    For i = 1 to n-1:
+        lambda[i] = h[i] / (h[i-1] + h[i])
+        mu[i] = 1 - lambda[i]
+        d[i] = 24/(h[i-1] + h[i]) * ( (y[i+1] - y[i]) / h[i] - (y[i] - y[i-1]) / h[i-1] )
+    // Tùy điều kiện biên có thể thêm hệ số đầu/cuối, m0, mn bằng 0, bằng giá trị tính hoặc lý thuyết bài toán cho trước
+
+Bước 4: Giải hệ phương trình tam trùng để lấy m[0..n] (tùy điều kiện biên thay đổi như spline bậc 3)
+    2*mu[0]*m[0] + lambda[0]*m[1] = ...
+    mu[i]*m[i-1] + 2*m[i] + lambda[i]*m[i+1] = d[i] với i = 1..n-1
+    mu[n]*m[n-1] + 2*m[n] = ...
+    (biên có thể là 0 hoặc khớp đạo hàm bậc 2 theo biên yêu cầu)
+
+Bước 5: Tính hệ số phi, theta từng đoạn
+    For i = 0 đến n-1:
+        phi[i] = y[i+1]/h[i] - m[i+1]*h[i]/24     // phi biên phải đoạn i
+        theta[i] = y[i]/h[i] - m[i]*h[i]/24      // theta biên trái đoạn i
+
+Bước 6: Với mỗi đoạn [x_i, x_{i+1}], giải hệ lấy a0...a4:
+    a0 = y[i]
+    a1 = phi[i]                // hoặc y1[i] nếu có
+    a2 = m[i]/2
+    // Dùng các điều kiện S_i(x_i+1) = y[i+1], S_i'(x_i+1) = y1[i+1], S_i''(x_i+1) = m[i+1]
+    // Đưa về hệ 3pt với 3 ẩn a2, a3, a4 rồi thế ngược a2 đã có:
+    Lập 3 phương trình:
+        a0 + a1*h[i] + a2*h[i]^2 + a3*h[i]^3 + a4*h[i]^4 = y[i+1]
+        a1 + 2*a2*h[i] + 3*a3*h[i]^2 + 4*a4*h[i]^3 = phi[i+1] (đạo hàm phải)
+        2*a2 + 6*a3*h[i] + 12*a4*h[i]^2 = m[i+1] (đạo hàm 2 phía phải)
+    Giải hệ lấy a3, a4
+
+Bước 7: Xuất a0, a1, a2, a3, a4 trên mỗi đoạn (x_i, x_{i+1}) với S_i(x) = a0 + a1*(x-xi) + a2*(x-xi)^2 + a3*(x-xi)^3 + a4*(x-xi)^4
+
+Kết thúc

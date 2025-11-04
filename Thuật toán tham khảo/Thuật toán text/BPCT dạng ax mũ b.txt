@@ -1,0 +1,34 @@
+Thuật toán bình phương cực tiểu dạng y = a*x^b (tham khảo lược đồ ảnh)
+
+Input:
+    Nhập giá trị x[], y[] (n điểm thực nghiệm)
+Output:
+    Hệ số hồi quy a, b cho mô hình y = a*x^b
+
+Bước 1: Xây dựng ma trận M chứa các giá trị phi
+    phi[] = [1, ln(x)], với ln(x) là log tự nhiên của x
+    For i = 0 đến n-1:
+        M[i][0] = 1
+        M[i][1] = ln(x[i])
+
+Bước 2: Kiểm tra dấu các y[i]
+    Nếu tất cả y[i] > 0: 
+        Y[i] = ln(y[i]), sgn = 1
+    Nếu tất cả y[i] < 0:
+        Y[i] = ln(-y[i]), sgn = -1
+    Nếu y[] vừa âm vừa dương: input không thỏa mãn, dừng
+
+Bước 3: Tính toán ma trận phụ trợ
+    Tính M_T = chuyển vị của M
+    Tính A = M_T * M (ma trận 2x2)
+    Tính B = M_T * Y (vector 2 chiều)
+
+Bước 4: Giải hệ A*a = B
+    Giải hệ bằng khử Gauss hoặc tính nghịch đảo: 
+        [a0, a1] = (M_T*M)^{-1} * (M_T*Y)
+    Kết quả: a0 = ln(a), a1 = b
+
+Bước 5: Hiệu chỉnh
+    Trả về a = sgn * exp(a0), b = a1
+
+Kết thúc

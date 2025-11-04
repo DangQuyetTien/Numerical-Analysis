@@ -1,0 +1,31 @@
+Thuật toán Ghép trơn cấp 2 (Spline bậc 2)
+
+Input:
+    Mảng x[] chứa n+1 mốc nội suy
+    Mảng y[] chứa n+1 giá trị
+    Nếu có: f'(a) là đạo hàm tại biên đầu
+Output:
+    Mảng hệ số a0, a1, a2 cho mỗi đoạn [x_i, x_{i+1}]
+
+Bước 1: Kiểm tra trùng mốc
+    Nếu tồn tại x[i] = x[j] với i ≠ j thì xóa mốc trùng hoặc dừng
+
+Bước 2: Khởi tạo
+    n = len(x) - 1
+    h[i] = x[i+1] - x[i] với i = 0..n-1
+    m[0] = (y[1] - y[0]) / (x[1] - x[0])
+
+Bước 3: Giải hệ phương trình tuyến tính để tìm các hệ số m[i]:
+    m[0] = f'(a) (nếu cho hoặc gán theo công thức trên)
+    Với i = 1..n, m[i+1] + m[i] = 2*(y[i+1] - y[i]) / h[i]
+
+Bước 4: Tính hệ số đa thức từng đoạn
+    For i = 0 đến n-1:
+        a2 = (m[i+1] - m[i]) / (2*h[i])
+        a1 = (m[i+1]*x[i] + m[i]*x[i+1]) / h[i]
+        a0 = (-m[i+1]*x[i]^2 + m[i]*x[i+1]^2)/ (2*h[i]) + y[i]*m[i+1]*h[i]/2 + y[i+1]*m[i]*h[i]/2
+
+Bước 5: In ra hệ số đa thức trên mỗi đoạn
+    Với mỗi đoạn [x_i, x_{i+1}], xuất các hệ số a0, a1, a2 vừa tính
+
+Kết thúc
