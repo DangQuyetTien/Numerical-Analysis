@@ -1,0 +1,47 @@
+Thuật toán tính đạo hàm cấp k của đa thức tại x=c
+
+Input:
+a[] - Mảng hệ số của đa thức P(x) từ bậc cao đến bậc thấp
+k - Cấp của đạo hàm cần tính
+c - Điểm tại đó tính đạo hàm
+
+Output:
+kq - Giá trị P^(k)(c)
+
+Bước 1: Kiểm tra điều kiện Input
+    if k < 0: return LỖI (Không tính đạo hàm bậc âm)
+    n = len(a) - 1 (Bậc của đa thức P(x))
+    if n < k: return 0 (Đạo hàm bậc cao hơn bậc đa thức luôn bằng 0)
+
+Bước 2: Khởi tạo:
+    r = 0 (Biến để lưu số dư cuối cùng)
+	mảng b[] chứa n + 1 số 0
+    b[] = a[]
+
+Bước 3: Thực hiện lặp áp dụng lược đồ Horner (k+1) lần
+    for i = 0 to k:
+        b[] = chia(b[], c)
+    return giaithua(k) * b[n-k]
+
+
+Thuật toán phụ trợ 1: chia(b[], c)
+   
+Bước 1: Khởi tạo:    
+    n = len(b[]) - 1
+    mảng a[] chứa n + 1 số 0
+	a[0] = b[0]
+
+Bước 2:
+    for i = 1 to n:
+        a[i] = b[i] + a[i - 1] * c
+    return a[]
+
+Thuật toán phụ trợ 2: giaithua(k)
+
+    if k == 0: return 1
+    f = 1
+    for i = 1 to k:
+        f = f * i
+    return f
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản (mảng 1 chiều, vòng lặp, điều kiện)

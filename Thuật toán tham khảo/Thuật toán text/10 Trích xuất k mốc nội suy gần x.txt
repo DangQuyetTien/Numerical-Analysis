@@ -1,0 +1,39 @@
+Thuật toán Trích xuất k mốc Nội suy Gần x̄
+
+Input:
+mang x[] - Mảng đầy đủ n mốc x_i (đã sắp xếp)
+mang y[] - Mảng đầy đủ n giá trị y_i tương ứng
+k - Số lượng mốc cần trích xuất
+x_bar - Giá trị x̄ cần tính
+
+Output:
+mang x_k[] - Mảng con chứa k giá trị x đã chọn
+mang y_k[] - Mảng con chứa k giá trị y tương ứng
+
+Bước 1: Tính toán các giá trị cơ sở
+    n = len(x[])
+    h = x[1] - x[0]
+    t_bar = (x_bar - x[0]) / h
+
+Bước 2: Tìm chỉ số trung tâm
+    i_center = round(t_bar) ( làm tròn đến số nguyên gần nhất )
+
+Bước 3: Tính chỉ số bắt đầu
+    i_start = i_center - floor(k / 2) ( Làm tròn xuống số nguyên lớn gần nhất )
+
+Bước 4: Điều chỉnh Ranh giới
+    if i_start < 0:
+        i_start = 0
+    i_end = i_start + k - 1
+    if i_end > n - 1:
+        i_end = n - 1
+        i_start = i_end - (k - 1)
+    if i_start < 0: i_start = 0
+
+Bước 5: Trích xuất dữ liệu
+    x_k[] = x[i_start ... i_end]
+    y_k[] = y[i_start ... i_end]
+
+Bước 6: Return x_k[], y_k[]
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản (mảng 1 chiều, vòng lặp, hàm round và floor)

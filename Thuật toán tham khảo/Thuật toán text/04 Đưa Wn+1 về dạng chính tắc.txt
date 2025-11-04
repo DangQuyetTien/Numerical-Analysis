@@ -1,0 +1,34 @@
+Viết thuật toán tìm hệ số của đa thức w(x) = (x-a₀)(x-a₁)...(x-aₙ₋₁)
+
+Input:
+a[] - Mảng các hằng số [a₀, a₁, ..., aₙ₋₁]
+
+Output:
+b[] - Mảng hệ số của đa thức w(x), sắp xếp từ bậc cao đến bậc thấp
+
+Bước 1: Khởi tạo:
+    n = len(a)
+    if n == 0: return [1]
+    b[] = [1, -a[0]]
+
+Bước 2: Lặp để nhân đa thức
+    for i = 1 to n-1:
+        b[] = nhan(b[], a[i])
+
+Bước 3: Return b[]
+
+Thuật toán phụ trợ: nhan(b[], c)
+
+Bước 1: Khởi tạo
+    n = len(b[]) - 1
+    a[] chứa n+2 số 0
+    a[0] = b[0]
+    a[n+1] = -b[n] * c
+
+Bước 2: Lặp tính hệ số trung gian
+    for j = 1 to n:
+        a[j] = b[j] - b[j-1] * c
+
+Bước 5: Return a[]
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản (mảng 1 chiều, vòng lặp)

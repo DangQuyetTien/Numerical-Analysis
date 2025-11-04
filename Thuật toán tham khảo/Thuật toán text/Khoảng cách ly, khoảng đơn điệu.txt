@@ -1,10 +1,10 @@
-Thuật toán Xác định Khoảng Đơn điệu và Khoảng Cách lập của Hàm số
+Thuật toán Xác định Khoảng Đơn điệu và Khoảng Cách ly của Hàm số
 Input:
 	Mảng x[] chứa các mốc dữ liệu
 	Mảng y[] chứa giá trị tương ứng
 Output:
 	Mảng mono[] chứa các khoảng đơn điệu [x_start, x_end, kiểu] (kiểu: 1=tăng, -1=giảm)
-	Mảng isol[] chứa các khoảng cách lập [x_start, x_end]
+	Mảng isol[] chứa các khoảng cách ly [x_start, x_end]
 
 Bước 1: Check điều kiện Input
 	Kiểm tra độ dài x[] và y[] có bằng nhau không, nếu không dừng
@@ -12,54 +12,62 @@ Bước 1: Check điều kiện Input
 
 Bước 2: Khởi tạo các biến, mảng trung gian
 	n = len(x) - 1
-	mono[] = mảng rỗng		// lưu các khoảng đơn điệu
-	isol[] = mảng rỗng		// lưu các khoảng cách lập
-	trend = 0				// xu hướng hiện tại: 1=tăng, -1=giảm, 0=chưa xác định
-	x_start = x[0]			// bắt đầu khoảng đơn điệu
-	eps = 1e-6				// sai số nhỏ để so sánh
+	mono[][] = mảng (n+1) x 3 số 0		// lưu các khoảng đơn điệu
+	isol[][] = mảng (n+1) x 2 số 0		// lưu các khoảng cách ly
+	cnt_mono = 0						// đếm số khoảng đơn điệu
+	cnt_isol = 0						// đếm số khoảng cách ly
+	trend = 0							// xu hướng hiện tại: 1=tăng, -1=giảm, 0=chưa xác định
+	x_start = x[0]						// bắt đầu khoảng đơn điệu
+	eps = 1e-6							// sai số nhỏ để so sánh
 
 Bước 3: Xác định các khoảng đơn điệu dựa trên xu hướng tăng/giảm của y
 	For i = 0 to n-1:
 		If abs(y[i+1] - y[i]) < eps:
-			// y[i] ≈ y[i+1], tiếp tục xu hướng hiện tại
 			continue
 		Else If y[i+1] > y[i]:
-			// y tăng
 			If trend == -1:
-				// Đổi từ giảm sang tăng, lưu khoảng giảm
-				Thêm [x_start, x[i], -1] vào mono
+				mono[cnt_mono][0] = x_start
+				mono[cnt_mono][1] = x[i]
+				mono[cnt_mono][2] = -1
+				cnt_mono = cnt_mono + 1
 				x_start = x[i]
 			trend = 1
 		Else:
-			// y giảm
 			If trend == 1:
-				// Đổi từ tăng sang giảm, lưu khoảng tăng
-				Thêm [x_start, x[i], 1] vào mono
+				mono[cnt_mono][0] = x_start
+				mono[cnt_mono][1] = x[i]
+				mono[cnt_mono][2] = 1
+				cnt_mono = cnt_mono + 1
 				x_start = x[i]
 			trend = -1
-	// Lưu khoảng cuối cùng
 	If trend ≠ 0:
-		Thêm [x_start, x[n], trend] vào mono
+		mono[cnt_mono][0] = x_start
+		mono[cnt_mono][1] = x[n]
+		mono[cnt_mono][2] = trend
+		cnt_mono = cnt_mono + 1
 
-Bước 4: Xác định các khoảng cách lập dựa trên đổi dấu của y
+Bước 4: Xác định các khoảng cách ly dựa trên đổi dấu của y
 	For i = 0 to n-1:
 		If y[i] * y[i+1] < 0:
-			// f(x[i]) và f(x[i+1]) trái dấu, chắc chắn có nghiệm trong (x[i], x[i+1])
-			Thêm [x[i], x[i+1]] vào isol
+			isol[cnt_isol][0] = x[i]
+			isol[cnt_isol][1] = x[i+1]
+			cnt_isol = cnt_isol + 1
 		Else If abs(y[i]) < eps:
-			// y[i] ≈ 0, gần bằng 0
-			If i == 0 Or i == n:
-				// Ở đầu hoặc cuối, lưu khoảng với điểm tiếp theo
-				If i == 0 And y[1] ≠ 0:
-					Thêm [x[0], x[1]] vào isol
-				If i == n And y[n-1] ≠ 0:
-					Thêm [x[n-1], x[n]] vào isol
-			Else:
-				// Ở giữa, kiểm tra đổi xu hướng
+			If i == 0 And abs(y[1]) > eps:
+				isol[cnt_isol][0] = x[0]
+				isol[cnt_isol][1] = x[1]
+				cnt_isol = cnt_isol + 1
+			Else If i == n And abs(y[n-1]) > eps:
+				isol[cnt_isol][0] = x[n-1]
+				isol[cnt_isol][1] = x[n]
+				cnt_isol = cnt_isol + 1
+			Else If i > 0 And i < n:
 				If (y[i-1] > 0 And y[i+1] < 0) Or (y[i-1] < 0 And y[i+1] > 0):
-					Thêm [x[i-1], x[i+1]] vào isol
+					isol[cnt_isol][0] = x[i-1]
+					isol[cnt_isol][1] = x[i+1]
+					cnt_isol = cnt_isol + 1
 
-Bước 5: Return kết quả
-	Return [mono, isol]
+Bước 5: Trả về kết quả
+	Return [mono[0..cnt_mono-1], isol[0..cnt_isol-1]]
 
-Các gói (package) sử dụng: Không cần gói ngoài, chỉ sử dụng các phép toán số học cơ bản và cấu trúc mảng 1 chiều
+Các gói (package) sử dụng: Không cần gói ngoài, chỉ sử dụng các phép toán số học cơ bản và cấu trúc mảng 1 chiều, 2 chiều

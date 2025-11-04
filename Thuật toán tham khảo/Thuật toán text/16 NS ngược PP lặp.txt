@@ -1,0 +1,163 @@
+Nội suy Ngược - Phương pháp lặp (Xử lý khoảng)
+
+Input:
+mang x_all[] - Mảng đầy đủ n mốc x_i (đã sắp xếp, cách đều)
+mang y_all[] - Mảng đầy đủ n giá trị y_i (có thể có nhiều khoảng đơn điệu)
+y_bar - Giá trị y mà ta muốn tìm x tương ứng
+k - Số lượng mốc sẽ sử dụng để xây dựng đa thức
+eps - Độ chính xác mong muốn
+
+Output:
+x_bar - Giá trị x được nội suy, hoặc LỖI
+
+Bước 1: Tìm và Chọn Khoảng Đơn Điệu
+    n_total = len(x_all)
+    if n_total < 2 or n_total != len(y_all): return LỖI (Dữ liệu không hợp lệ)
+    start, end = TimKhoangDonDieu(y_all, y_bar, eps)
+    if start == -1: return LỖI (Không tìm thấy khoảng đơn điệu nào chứa y_bar)
+
+Bước 2: Trích xuất k mốc từ Khoảng đã chọn
+    x_seg = x_all[start ... end]
+    y_seg = y_all[start ... end]
+    x_k, y_k = TrichXuatMocY_TrongKhoang(x_seg, y_seg, k, y_bar)
+    k_data = len(x_k)
+    if k_data < 2: return LỖI (Không đủ điểm để nội suy)
+
+Bước 3: Check Mốc Cách đều và Khởi tạo
+    h = x_k[1] - x_k[0]
+    x_0 = x_k[0]
+    y_0 = y_k[0]
+    for i = 2 to k_data-1:
+        if abs((x_k[i] - x_k[i-1]) - h) > eps: return LỖI (Các mốc trích xuất không cách đều)
+
+Bước 4: Tính Bảng Sai phân
+    D = SaiPhanTien(y_k)
+    if abs(D[1]) < eps: return LỖI (Sai phân bậc 1 bằng 0, không thể chia)
+
+Bước 5: Vòng lặp tìm t
+    t_0 = (y_bar - D[0]) / D[1]
+    t_new = t_0
+    t_old = t_0 + 2 * eps
+    max_iter = 100
+    iter = 0
+    while abs(t_new - t_old) > eps and iter < max_iter:
+        t_old = t_new
+        g_t = TinhGt(t_old, D, k_data)
+        t_new = t_0 - (g_t / D[1])
+        iter = iter + 1
+
+Bước 6: Return kết quả
+    x_bar = x_0 + t_new * h
+    return x_bar
+
+Thuật toán phụ trợ 1: TimKhoangDonDieu(y_all, y_bar, eps)
+
+Input:
+mang y_all[] - Mảng giá trị
+y_bar - Giá trị cần tìm
+eps - Độ chính xác
+
+Output:
+start, end - Chỉ số bắt đầu và kết thúc (hoặc -1, -1 nếu không tìm thấy)
+
+Bước 1: Khởi tạo
+    n = len(y_all)
+    if n < 2: return -1, -1
+    current_start = 0
+    trend = 0
+    if y_all[1] - y_all[0] > eps: trend = 1
+    else if y_all[1] - y_all[0] < -eps: trend = -1
+
+Bước 2: Duyệt mảng tìm khoảng
+    for i = 1 to n-1:
+        new_trend = 0
+        if y_all[i] - y_all[i-1] > eps: new_trend = 1
+        else if y_all[i] - y_all[i-1] < -eps: new_trend = -1
+        if new_trend != trend or i == n-1:
+            current_end = i-1
+            if i == n-1: current_end = i
+            y_min = min(y_all[current_start], y_all[current_end])
+            y_max = max(y_all[current_start], y_all[current_end])
+            if y_bar >= y_min - eps and y_bar <= y_max + eps:
+                return current_start, current_end
+            current_start = i-1
+            trend = new_trend
+
+Bước 3: Return
+    return -1, -1 ( Trả về lỗi k có khoảng đơn điệu nào chứa y_bar )
+
+Thuật toán phụ trợ 2: TrichXuatMocY_TrongKhoang(x_seg, y_seg, k, y_bar)
+
+Input:
+mang x_seg[], y_seg[] - Mảng trong khoảng
+k - Số mốc cần trích xuất
+y_bar - Giá trị cần căn giữa
+
+Output:
+mang x_k[], y_k[] - Mảng trích xuất
+
+Bước 1: Kiểm tra
+    n_seg = len(y_seg)
+    if k >= n_seg: return x_seg, y_seg
+
+Bước 2: Tìm chỉ số gần nhất
+    i_center = 0
+    min_dist = abs(y_seg[0] - y_bar)
+    for i = 1 to n_seg - 1:
+        dist = abs(y_seg[i] - y_bar)
+        if dist < min_dist:
+            min_dist = dist
+            i_center = i
+
+Bước 3: Xác định khoảng trích xuất
+    i_start = i_center - floor(k / 2)
+    if i_start < 0: i_start = 0
+    i_end = i_start + k - 1
+    if i_end > n_seg - 1:
+        i_end = n_seg - 1
+        i_start = i_end - (k - 1)
+    if i_start < 0: i_start = 0
+
+Bước 4: Return
+    return x_seg[i_start ... i_end], y_seg[i_start ... i_end]
+
+Thuật toán phụ trợ 3: SaiPhanTien(y)
+
+Input:
+mang y[] - Mảng n giá trị
+
+Output:
+mang D[] - Mảng sai phân [Δ^0 y_0, Δ^1 y_0, ..., Δ^{n-1} y_0]
+
+Bước 1: Khởi tạo
+    n = len(y)
+    mang temp[] = copy(y)
+    mang D[] có kích thước n
+
+Bước 2: Tính bảng sai phân
+    for k = 0 to n-1:
+        D[k] = temp[0]
+        for j = 0 to n - 2 - k:
+            temp[j] = temp[j+1] - temp[j]
+
+Bước 3: Return D[]
+
+Thuật toán phụ trợ 4: TinhGt(t, D, k_data)
+
+Input:
+t - Giá trị t hiện tại
+mang D[] - Mảng sai phân
+k_data - Số điểm dữ liệu
+
+Output:
+g_t - Giá trị g(t) = P(t) - y_bar
+
+Bước 1: Tính g(t) bằng lược đồ Horner
+    b = D[k_data - 1]
+    for i = k_data - 2 downto 1:
+        b = b * t + D[i]
+    g_t = D[0] + b * t - (giá trị y_bar đã lưu trong ngữ cảnh)
+
+Bước 2: Return g_t
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản (mảng 1 chiều, vòng lặp, hàm floor)

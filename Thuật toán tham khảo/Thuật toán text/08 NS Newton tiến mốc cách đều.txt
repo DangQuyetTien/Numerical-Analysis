@@ -1,0 +1,93 @@
+Nội suy Newton Tiến - Mốc Cách Đều
+
+Input:
+x[] - Mảng chứa n giá trị mốc x_i (phải cách đều)
+y[] - Mảng chứa n giá trị y_i tương ứng
+
+Output:
+a[] - Mảng hệ số (bậc n-1) của P(x) từ bậc cao đến bậc thấp
+
+Bước 1: Khởi tạo
+    n = len(x)
+    if n == 0: return []
+    if n == 1: return y
+    a[] chứa n số 0
+    W[] = [1]
+    h = x[1] - x[0]
+
+Bước 2: Tính bảng sai phân
+    D = SaiPhanTien(y)
+
+Bước 3: Vòng lặp xây dựng
+    for i = 0 to n-1:
+        h_pow = h^i
+        c = D[i] / (giai_thua(i) * h_pow)
+        k = len(W)
+        for j = 0 to k-1:
+            a[n - k + j] = a[n - k + j] + c * W[j]
+        if i < n-1:
+            W[] = nhandathuc(W[], x[i])
+
+Bước 4: Return a[]
+
+Thuật toán phụ trợ 1: SaiPhanTien(y)
+
+Input:
+y[] - Mảng các giá trị [y_0, y_1, ..., y_{n-1}]
+
+Output:
+D[] - Mảng chứa [Δ^0 (y_0), Δ^1 (y_0), ..., Δ^{n-1} (y_0)]
+
+Bước 1: Khởi tạo
+    n = len(y[])
+    temp[] = copy(y[]) ( sao chép mảng y[] vào temp[] )
+    D[] có kích thước n
+
+Bước 2: Tính bảng sai phân
+    for k = 0 to n-1:
+        D[k] = temp[0]
+        for j = 0 to n - 2 - k:
+            temp[j] = temp[j+1] - temp[j]
+
+Bước 3: Return D[]
+
+Thuật toán phụ trợ 2: nhandathuc(p, c)
+
+Input:
+mang p[] - Mảng hệ số của P(x) (bậc m) từ bậc cao đến bậc thấp
+c - Hằng số
+
+Output:
+mang b[] - Mảng hệ số của Q(x) = P(x)·(x-c) (bậc m+1)
+
+Bước 1: Khởi tạo
+    m = len(p) - 1
+    b[] chứa m+2 số 0
+    b[0] = p[0]
+    b[m+1] = -p[m] * c
+
+Bước 2: Lặp tính hệ số trung gian
+    for j = 1 to m:
+        b[j] = p[j] - p[j-1] * c
+
+Bước 5: Return b[]
+
+Thuật toán phụ trợ 3: giai_thua(k)
+
+Input:
+k - Số cần tính giai thừa
+
+Output:
+f - Giá trị k!
+
+Bước 1: Kiểm tra điều kiện cơ sở
+    if k == 0: return 1
+
+Bước 2: Tính giai thừa
+    f = 1
+    for i = 1 to k:
+        f = f * i
+
+Bước 3: Return f
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản (mảng 1 chiều, vòng lặp)
