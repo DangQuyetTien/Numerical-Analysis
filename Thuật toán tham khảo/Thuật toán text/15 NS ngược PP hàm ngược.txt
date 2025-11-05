@@ -25,14 +25,14 @@ Bước 2: Đảo vai trò dữ liệu
     x_values = x_all
 
 Bước 3: Tìm đa thức nội suy P(y)
-    a = NoiSuyNewtonMocBatKy(y_mocs, x_values)
+    a = nsNewtonMocBatKy(y_mocs, x_values)
 
-Bước 4: Tính giá trị x̄
+Bước 4: Tính giá trị x̄ tại y_bar
     x_bar = Tinh(a, y_bar)
 
 Bước 5: Return x_bar
 
-Thuật toán phụ trợ 1: NoiSuyNewtonMocBatKy(x_in, y_in)
+Thuật toán phụ trợ 1: nsNewtonMocBatKy(x_in, y_in)
 
 Input:
 mang x_in[] - Mảng mốc (trong trường hợp này là y_mocs)

@@ -1,16 +1,22 @@
-Bước 0: Check Input
-	n = len(x[])
-	if n == 0: return [] (Hoặc LỖI tùy quy ước).
-	if n == 1: return y[] (Đa thức bậc 0).
-	if len(y[]) != n: return LỖI: "Độ dài x và y không khớp"
-	Check Mốc trùng (và Sắp xếp):
-	Giả định x[] đã được sắp xếp tăng dần. Nếu chưa, bạn phải sắp xếp x và y đồng thời.
-	For i = 0 to n-2:
-	if abs(x[i+1] - x[i]) < epsilon:
-	return LỖI: "Dữ liệu có mốc trùng"
-	Check Mốc cách đều:
-	h = x[1] - x[0]
-	For i = 2 to n-1:
-	h_new = x[i] - x[i-1]
-	if abs(h_new - h) > epsilon:
-	return LỖI: "Các mốc không cách đều"
+Bước 0: 
+	
+	n = len(x)
+	Check Input:
+		if n == 0: return [] (Hoặc LỖI tùy quy ước).
+		if n == 1: return y[] (Đa thức bậc 0).
+		if len(y[]) != n: return LỖI: "Độ dài x và y không khớp"
+	
+	
+		Check Mốc trùng (và Sắp xếp):
+		Giả định x[] đã được sắp xếp tăng dần. Nếu chưa, bạn phải sắp xếp x và y đồng thời.
+		epsilon = 10^(-6)
+		For i = 0 to n-2:
+			if abs(x[i+1] - x[i]) < epsilon:
+				return LỖI: "Dữ liệu có mốc trùng"
+	
+		Check Mốc cách đều (với n > 2):
+		h = x[1] - x[0]
+		For i = 2 to n-1:
+			h_new = x[i] - x[i-1]
+			if abs(h_new - h) > epsilon:
+				return LỖI: "Các mốc không cách đều"

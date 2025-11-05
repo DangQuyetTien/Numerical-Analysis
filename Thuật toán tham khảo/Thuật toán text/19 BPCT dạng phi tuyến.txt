@@ -30,7 +30,7 @@ Bước 1: Kiểm tra dấu của Y (PRE-CHECK)
 
 Bước 2: Tiền xử lý (Chuyển đổi dữ liệu)
     Y_ln = new array[n]
-    sign_a = (Y[0] > 0) ? 1 : -1  // Xác định dấu của a từ dữ liệu
+    sign_a = (Y[0] > 0) ? 1 : -1  // Xác định dấu của a từ dữ liệu ( sign_a = 1 nếu Y dương, sign_a = - 1 nếu Y âm )
     for i = 0 to n-1:
         Y_ln[i] = ln(|Y[i]|)
 

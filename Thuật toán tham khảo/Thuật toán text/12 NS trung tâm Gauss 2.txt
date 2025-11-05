@@ -21,24 +21,22 @@ Bước 1: Kiểm tra Input
         if abs(h_new - h) > eps: return LỖI (Các mốc không cách đều)
 
 Bước 2: Khởi tạo
-    mang a[] có kích thước n số 0
+    mang a[] chứa n số 0
     mang W[] = [1]
-    i_0 = floor((n - 1) / 2)
+    i_0 = floor((n - 1) / 2) ( floor làm tròn xuống số nguyên lớn nhất )
 
 Bước 3: Tính bảng sai phân trung tâm
-    D_gauss2 = SaiPhanTrungTam_Gauss2(y, i_0)
+    D_gauss2 = spGauss2(y, i_0)
 
 Bước 4: Vòng lặp xây dựng
     for i = 0 to n-1:
-        f = giai_thua(i)
-        h_pow = h^i
-        c = D_gauss2[i] / (f * h_pow)
+        c = D_gauss2[i] / (giai_thua(i) * h^i)
         k = len(W)
         for j = 0 to k-1:
             a[n - k + j] = a[n - k + j] + c * W[j]
         if i < n-1:
             k_next = i + 1
-            j = ceil(k_next / 2)
+            j = ceil(k_next / 2) ( ceil làm tròn lên số nguyên nhỏ nhất )
             if k_next % 2 == 1:
                 next_moc_index = i_0 + j - 1
             else:
@@ -47,7 +45,7 @@ Bước 4: Vòng lặp xây dựng
 
 Bước 5: Return a[]
 
-Thuật toán phụ trợ 1: SaiPhanTrungTam_Gauss2(y, i_0)
+Thuật toán phụ trợ 1: spGauss2(y, i_0)
 
 Input:
 mang y[] - Mảng n giá trị
@@ -57,8 +55,8 @@ Output:
 mang D[] - Mảng chứa n giá trị [Δ^0 y_0, Δ^1 y_{-1}, Δ^2 y_{-1}, Δ^3 y_{-2}, Δ^4 y_{-2}, ...]
 
 Bước 1: Khởi tạo
-    n = len(y)
-    bang[][] - Bảng 2D kích thước n x n
+    n = len(y[])
+    bang[][] - Mảng 2D kích thước n x n
     for j = 0 to n-1:
         bang[j][0] = y[j]
 
@@ -86,15 +84,9 @@ mang b[] - Mảng hệ số của Q(x) = P(x)·(x-c) (bậc m+1)
 
 Bước 1: Khởi tạo
     m = len(p) - 1
-    mang b[] có kích thước m+2 số 0
-
-Bước 2: Tính hệ số đầu tiên
+    mang b[] chứa m+2 số 0
     b[0] = p[0]
-
-Bước 3: Tính hệ số cuối cùng
     b[m+1] = -p[m] * c
-
-Bước 4: Lặp tính hệ số trung gian
     for j = 1 to m:
         b[j] = p[j] - p[j-1] * c
 

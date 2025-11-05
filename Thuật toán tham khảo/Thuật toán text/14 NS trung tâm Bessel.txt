@@ -12,17 +12,17 @@ Bước 1: Kiểm tra Input
     n = len(x)
     if n == 0: return []
     if n == 1: return y
-    if len(y) != n: return LỖI (Độ dài x và y không khớp)
+    if len(y[]) != n: return LỖI (Độ dài x và y không khớp)
     for i = 0 to n-2:
         if abs(x[i+1] - x[i]) < eps: return LỖI (Dữ liệu có mốc trùng)
     h = x[1] - x[0]
     for i = 2 to n-1:
         h_new = x[i] - x[i-1]
         if abs(h_new - h) > eps: return LỖI (Các mốc không cách đều)
-    i_0 = floor((n - 1) / 2)
+    i_0 = floor((n - 1) / 2) ( floor làm tròn xuống số nguyên lớn nhất )
 
 Bước 2: Xây dựng đa thức P(u)
-    a_u = XayDungBesselU(y, i_0, n)
+    a_u = nsBessel(y, i_0, n)
 
 Bước 3: Chuyển đổi P(u) → P(x)
     x0 = x[i_0]
@@ -30,7 +30,7 @@ Bước 3: Chuyển đổi P(u) → P(x)
 
 Bước 4: Return a_x[]
 
-Thuật toán phụ trợ 1: XayDungBesselU(y, i_0, n)
+Thuật toán phụ trợ 1: nsBessel(y, i_0, n)
 
 Input:
 mang y[] - Mảng n giá trị
@@ -41,7 +41,7 @@ Output:
 mang a_u[] - Mảng hệ số của P(u) (bậc cao → thấp)
 
 Bước 1: Khởi tạo
-    D_le, D_chan_avg = SaiPhanTrungTam_Bessel(y, i_0)
+    D_le, D_chan_avg = spBessel(y, i_0)
     mang a_u[] có kích thước n số 0
     mang W_chan[] = [1]
     mang W_le[] = [1, 0]
@@ -51,16 +51,16 @@ Bước 1: Khởi tạo
 
 Bước 2: Vòng lặp xây dựng
     for i = 1 to floor((n-1) / 2):
-        c_sq = ((2*i - 1) * (2*i - 1)) / 4.0
+        c_sq = ((2*i - 1) * (2*i - 1)) / 4
         k = 2 * i
-        W_chan = NhanDaThucU2TruMinusC2(W_chan, c_sq)
+        W_chan = Nhan_U2truC2(W_chan, c_sq)
         C_k = D_chan_avg[i] / giai_thua(k)
         len_W = len(W_chan)
         for j = 0 to len_W - 1:
             a_u[n - len_W + j] = a_u[n - len_W + j] + C_k * W_chan[j]
         k = 2 * i + 1
         if k >= n: break
-        W_le = NhanDaThucU2TruMinusC2(W_le, c_sq)
+        W_le = Nhan_U2truC2(W_le, c_sq)
         C_k = D_le[i] / giai_thua(k)
         len_W = len(W_le)
         for j = 0 to len_W - 1:
@@ -79,7 +79,7 @@ Output:
 mang P_x[] - Hệ số P(x) (bậc cao → thấp)
 
 Bước 1: Khởi tạo
-    alpha = 1.0 / h
+    alpha = 1 / h
     beta = -(x0 / h + 0.5)
     n = len(a_u)
     mang C[] có kích thước n
@@ -95,7 +95,7 @@ Bước 2: Áp dụng lược đồ Horner tổng quát
 
 Bước 3: Return P_x[]
 
-Thuật toán phụ trợ 3: SaiPhanTrungTam_Bessel(y, i_0)
+Thuật toán phụ trợ 3: spBessel(y, i_0)
 
 Input:
 mang y[] - Mảng n giá trị
@@ -106,7 +106,7 @@ mang D_le[], D_chan_avg[] - Mảng sai phân lẻ và trung bình chẵn
 
 Bước 1: Xây dựng bảng sai phân
     n = len(y)
-    bang[][] - Bảng 2D kích thước n x n
+    bang[][] - Mảng 2D kích thước n x n
     for j = 0 to n-1: bang[j][0] = y[j]
     for k = 1 to n-1:
         for j = 0 to n - 1 - k:
@@ -116,7 +116,7 @@ Bước 2: Trích xuất sai phân Bessel
     mang D_le[] = []
     mang D_chan_avg[] = []
     for k = 0 to n-1:
-        if k % 2 == 1:
+        if k % 2 == 1: ( % Phép chia lấy phần dư )
             i = (k - 1) / 2
             j_index = i_0 - i
             add bang[j_index][k] to D_le
@@ -132,7 +132,7 @@ Bước 2: Trích xuất sai phân Bessel
 
 Bước 3: Return D_le[], D_chan_avg[]
 
-Thuật toán phụ trợ 4: NhanDaThucU2TruMinusC2(p, c_sq)
+Thuật toán phụ trợ 4: Nhan_U2truC2(p[], c_sq)
 
 Input:
 mang p[] - Hệ số P(u) (bậc m) từ bậc cao → thấp
@@ -142,12 +142,14 @@ Output:
 mang b[] - Hệ số P(u)·(u² - c_sq) (bậc m+2)
 
 Bước 1: Khởi tạo
-    m = len(p) - 1
-    mang b[] có kích thước m+3 số 0
+    m = len(p[]) - 1
+    mang b[] chứa m+3 số 0
 
 Bước 2: Thực hiện phép nhân
-    for j = 0 to m: b[j] = p[j]
-    for j = 0 to m: b[j+2] = b[j+2] - c_sq * p[j]
+    for j = 0 to m: 
+		b[j] = p[j]
+    for j = 0 to m: 
+		b[j+2] = b[j+2] - c_sq * p[j]
 
 Bước 3: Return b[]
 
@@ -165,8 +167,10 @@ Bước 1: Khởi tạo
     mang b[] có kích thước m+2 số 0
 
 Bước 2: Thực hiện phép nhân
-    for j = 0 to m: b[j] = p[j] * alpha
-    for j = 0 to m: b[j+1] = b[j+1] + p[j] * beta
+    for j = 0 to m: 
+		b[j] = p[j] * alpha
+    for j = 0 to m: 
+		b[j+1] = b[j+1] + p[j] * beta
 
 Bước 3: Return b[]
 
