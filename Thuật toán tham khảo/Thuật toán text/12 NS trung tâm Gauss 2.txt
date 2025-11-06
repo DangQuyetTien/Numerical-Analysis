@@ -1,0 +1,113 @@
+Nội suy Gauss II - Gauss Lùi
+
+Input:
+mang x[] - Mảng chứa n giá trị mốc x_i (đã sắp xếp)
+mang y[] - Mảng chứa n giá trị y_i tương ứng
+eps - Số rất nhỏ (ví dụ: 1e-9) để kiểm tra mốc
+
+Output:
+mang a[] - Mảng hệ số (bậc n-1) của P(x) từ bậc cao đến bậc thấp, hoặc LỖI
+
+Bước 1: Kiểm tra Input
+    n = len(x)
+    if n == 0: return []
+    if n == 1: return y
+    if len(y) != n: return LỖI (Độ dài x và y không khớp)
+    for i = 0 to n-2:
+        if abs(x[i+1] - x[i]) < eps: return LỖI (Dữ liệu có mốc trùng)
+    h = x[1] - x[0]
+    for i = 2 to n-1:
+        h_new = x[i] - x[i-1]
+        if abs(h_new - h) > eps: return LỖI (Các mốc không cách đều)
+
+Bước 2: Khởi tạo
+    mang a[] chứa n số 0
+    mang W[] = [1]
+    i_0 = floor((n - 1) / 2) ( floor làm tròn xuống số nguyên lớn nhất )
+
+Bước 3: Tính bảng sai phân trung tâm
+    D_gauss2 = spGauss2(y, i_0)
+
+Bước 4: Vòng lặp xây dựng
+    for i = 0 to n-1:
+        c = D_gauss2[i] / (giai_thua(i) * h^i)
+        k = len(W)
+        for j = 0 to k-1:
+            a[n - k + j] = a[n - k + j] + c * W[j]
+        if i < n-1:
+            k_next = i + 1
+            j = ceil(k_next / 2) ( ceil làm tròn lên số nguyên nhỏ nhất )
+            if k_next % 2 == 1:
+                next_moc_index = i_0 + j - 1
+            else:
+                next_moc_index = i_0 - j
+            W = nhandathuc(W, x[next_moc_index])
+
+Bước 5: Return a[]
+
+Thuật toán phụ trợ 1: spGauss2(y, i_0)
+
+Input:
+mang y[] - Mảng n giá trị
+i_0 - Chỉ số trung tâm
+
+Output:
+mang D[] - Mảng chứa n giá trị [Δ^0 y_0, Δ^1 y_{-1}, Δ^2 y_{-1}, Δ^3 y_{-2}, Δ^4 y_{-2}, ...]
+
+Bước 1: Khởi tạo
+    n = len(y[])
+    bang[][] - Mảng 2D kích thước n x n
+    for j = 0 to n-1:
+        bang[j][0] = y[j]
+
+Bước 2: Tính bảng sai phân
+    for k = 1 to n-1:
+        for j = 0 to n - 1 - k:
+            bang[j][k] = bang[j+1][k-1] - bang[j][k-1]
+
+Bước 3: Trích xuất đường chéo Gauss II
+    mang D[] có kích thước n
+    for k = 0 to n-1:
+        j_index = i_0 - ceil(k / 2)
+        D[k] = bang[j_index][k]
+
+Bước 4: Return D[]
+
+Thuật toán phụ trợ 2: nhandathuc(p, c)
+
+Input:
+mang p[] - Mảng hệ số của P(x) (bậc m) từ bậc cao đến bậc thấp
+c - Hằng số
+
+Output:
+mang b[] - Mảng hệ số của Q(x) = P(x)·(x-c) (bậc m+1)
+
+Bước 1: Khởi tạo
+    m = len(p) - 1
+    mang b[] chứa m+2 số 0
+    b[0] = p[0]
+    b[m+1] = -p[m] * c
+    for j = 1 to m:
+        b[j] = p[j] - p[j-1] * c
+
+Bước 5: Return b[]
+
+Thuật toán phụ trợ 3: giai_thua(k)
+
+Input:
+k - Số cần tính giai thừa
+
+Output:
+f - Giá trị k!
+
+Bước 1: Kiểm tra điều kiện cơ sở
+    if k == 0: return 1
+
+Bước 2: Tính giai thừa
+    f = 1
+    for i = 1 to k:
+        f = f * i
+
+Bước 3: Return f
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản (mảng 2 chiều, vòng lặp, hàm ceil và floor)

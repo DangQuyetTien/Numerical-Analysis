@@ -1,0 +1,346 @@
+Nội suy Ngược - Phương pháp lặp (Xử lý khoảng)
+
+Input:
+mang x_all[] - Mảng đầy đủ n mốc x_i (đã sắp xếp, cách đều)
+mang y_all[] - Mảng đầy đủ n giá trị y_i (có thể có nhiều khoảng đơn điệu)
+y_bar - Giá trị y mà ta muốn tìm x tương ứng
+k - Số lượng mốc sẽ sử dụng để xây dựng đa thức
+eps - Độ chính xác mong muốn
+
+Output:
+x_bar - Giá trị x được nội suy, hoặc LỖI
+
+Bước 1: Tìm và Chọn Khoảng Đơn Điệu
+    n_total = len(x_all)
+    if n_total < 2 or n_total != len(y_all): return LỖI (Dữ liệu không hợp lệ)
+    start, end = TimKhoangDonDieu(y_all, y_bar, eps)
+    if start == -1: return LỖI (Không tìm thấy khoảng đơn điệu nào chứa y_bar)
+
+Bước 2: Trích xuất k mốc từ Khoảng đã chọn
+    x_seg = x_all[start ... end]
+    y_seg = y_all[start ... end]
+    x_k, y_k = TrichXuatMocY_TrongKhoang(x_seg, y_seg, k, y_bar)
+    k_data = len(x_k)
+    if k_data < 2: return LỖI (Không đủ điểm để nội suy)
+
+Bước 3: Check Mốc Cách đều và Khởi tạo
+    h = x_k[1] - x_k[0]
+    x_0 = x_k[0]
+    y_0 = y_k[0]
+    for i = 2 to k_data-1:
+        if abs((x_k[i] - x_k[i-1]) - h) > eps: return LỖI (Các mốc trích xuất không cách đều)
+
+Bước 4: Tính Bảng Sai phân
+    D = SaiPhanTien(y_k)
+    if abs(D[1]) < eps: return LỖI (Sai phân bậc 1 bằng 0, không thể chia)
+
+Bước 5: Vòng lặp tìm t
+    t_0 = (y_bar - D[0]) / D[1]
+    t_new = t_0
+    t_old = t_0 + 2 * eps
+    max_iter = 100
+    iter = 0
+    while abs(t_new - t_old) > eps and iter < max_iter:
+        t_old = t_new
+        g_t = TinhGt(t_old, D, k_data)
+        t_new = t_0 - (g_t / D[1])
+        iter = iter + 1
+
+Bước 6: Return kết quả
+    x_bar = x_0 + t_new * h
+    return x_bar
+
+Thuật toán phụ trợ 1: TimKhoangDonDieu(y_all, y_bar, eps)
+
+Input:
+mang y_all[] - Mảng giá trị
+y_bar - Giá trị cần tìm
+eps - Độ chính xác
+
+Output:
+start, end - Chỉ số bắt đầu và kết thúc (hoặc -1, -1 nếu không tìm thấy)
+
+Bước 1: Khởi tạo
+    n = len(y_all)
+    if n < 2: return -1, -1
+    current_start = 0
+    trend = 0
+    if y_all[1] - y_all[0] > eps: trend = 1
+    else if y_all[1] - y_all[0] < -eps: trend = -1
+
+Bước 2: Duyệt mảng tìm khoảng
+    for i = 1 to n-1:
+        new_trend = 0
+        if y_all[i] - y_all[i-1] > eps: new_trend = 1
+        else if y_all[i] - y_all[i-1] < -eps: new_trend = -1
+        if new_trend != trend or i == n-1:
+            current_end = i-1
+            if i == n-1: current_end = i
+            y_min = min(y_all[current_start], y_all[current_end])
+            y_max = max(y_all[current_start], y_all[current_end])
+            if y_bar >= y_min - eps and y_bar <= y_max + eps:
+                return current_start, current_end
+            current_start = i-1
+            trend = new_trend
+
+Bước 3: Return
+    return -1, -1 ( Trả về lỗi k có khoảng đơn điệu nào chứa y_bar )
+
+Thuật toán phụ trợ 2: TrichXuatMocY_TrongKhoang(x_seg, y_seg, k, y_bar)
+
+Input:
+mang x_seg[], y_seg[] - Mảng trong khoảng
+k - Số mốc cần trích xuất
+y_bar - Giá trị cần căn giữa
+
+Output:
+mang x_k[], y_k[] - Mảng trích xuất
+
+Bước 1: Kiểm tra
+    n_seg = len(y_seg)
+    if k >= n_seg: return x_seg, y_seg
+
+Bước 2: Tìm chỉ số gần nhất
+    i_center = 0
+    min_dist = abs(y_seg[0] - y_bar)
+    for i = 1 to n_seg - 1:
+        dist = abs(y_seg[i] - y_bar)
+        if dist < min_dist:
+            min_dist = dist
+            i_center = i
+
+Bước 3: Xác định khoảng trích xuất
+    i_start = i_center - floor(k / 2)
+    if i_start < 0: i_start = 0
+    i_end = i_start + k - 1
+    if i_end > n_seg - 1:
+        i_end = n_seg - 1
+        i_start = i_end - (k - 1)
+    if i_start < 0: i_start = 0
+
+Bước 4: Return
+    return x_seg[i_start ... i_end], y_seg[i_start ... i_end]
+
+Thuật toán phụ trợ 3: SaiPhanTien(y)
+
+Input:
+mang y[] - Mảng n giá trị
+
+Output:
+mang D[] - Mảng sai phân [Δ^0 y_0, Δ^1 y_0, ..., Δ^{n-1} y_0]
+
+Bước 1: Khởi tạo
+    n = len(y)
+    mang temp[] = copy(y)
+    mang D[] có kích thước n
+
+Bước 2: Tính bảng sai phân
+    for k = 0 to n-1:
+        D[k] = temp[0]
+        for j = 0 to n - 2 - k:
+            temp[j] = temp[j+1] - temp[j]
+
+Bước 3: Return D[]
+
+Thuật toán phụ trợ 4 (Đã sửa): TinhGt(t, D, k_data)
+Input:
+t - Giá trị t hiện tại
+mang D[] - Mảng sai phân
+k_data - Số điểm dữ liệu
+Output:
+g_t - Giá trị của g(t) = \sum_{i=2}^{k\_data-1} ( Delta^i(y_0)/i! ) * t(t-1)...(t-i+1)
+
+Bước 1: Khởi tạo:
+	g_t = 0
+	if k_data <= 2: return 0 (Không có số hạng bậc cao)
+	fact = 2 (Giai thừa của i=2)
+	t_product = t * (t - 1) (Tích t(t-1))
+	g_t = g_t + (D[2] / 2) * t_product (Tính số hạng bậc 2 (i=2))
+	
+Bước 2: Vòng lặp tính các số hạng bậc cao (i = 3 đến k_data-1):
+	For i = 3 to k_data - 1:
+		t_product = t_product * (t - (i - 1))
+		fact = fact * i
+		g_t = g_t + (D[i] / fact) * t_product
+	Return: g_t
+
+
+
+
+
+
+
+
+
+
+
+===============================================================================================================================================
+
+
+Tên biến, hàm ngắn gọn
+Input:
+x_all[] - Mảng đầy đủ n mốc x_i (đã sắp xếp, cách đều)
+y_all[] - Mảng đầy đủ n giá trị y_i (có thể có nhiều khoảng đơn điệu)
+y_bar - Giá trị y mà ta muốn tìm x tương ứng
+k - Số lượng mốc sẽ sử dụng để xây dựng đa thức
+eps - Độ chính xác mong muốn
+
+Output:
+x_bar - Giá trị x được nội suy, hoặc LỖI
+
+Bước 1: Tìm và Chọn Khoảng Đơn Điệu
+    n = len(x_all)
+    if n < 2 or n != len(y_all): return LỖI (Dữ liệu không hợp lệ)
+    st, ed = TimKĐĐ(y_all, y_bar, eps)
+    if st == -1: return LỖI (Không tìm thấy khoảng đơn điệu nào chứa y_bar)
+
+Bước 2: Trích xuất k mốc từ Khoảng đã chọn
+    x_seg = x_all[st ... ed]
+    y_seg = y_all[st ... ed]
+    x_k, y_k = TrchMoc(x_seg, y_seg, k, y_bar)
+    m = len(x_k)
+    if m < 2: return LỖI (Không đủ điểm để nội suy)
+
+Bước 3: Check Mốc Cách đều và Khởi tạo
+    h = x_k[1] - x_k[0]
+    x0 = x_k[0]
+    y0 = y_k[0]
+    for i = 2 to m-1:
+        if abs((x_k[i] - x_k[i-1]) - h) > eps: return LỖI (Các mốc trích xuất không cách đều)
+
+Bước 4: Tính Bảng Sai phân
+    D = SPh(y_k)
+    if abs(D[1]) < eps: return LỖI (Sai phân bậc 1 bằng 0, không thể chia)
+
+Bước 5: Vòng lặp tìm t
+    t0 = (y_bar - D[0]) / D[1]
+    tn = t0
+    to = t0 + 2 * eps
+    itr = 0
+    while abs(tn - to) > eps and itr < 100:
+        to = tn
+        gt = TnhGt(to, D, m)
+        tn = t0 - (gt / D[1])
+        itr = itr + 1
+
+Bước 6: Return kết quả
+    x_bar = x0 + tn * h
+    return x_bar
+
+Thuật toán phụ trợ 1: TimKĐĐ(y_all, y_bar, eps)
+
+Input:
+y_all[] - Mảng giá trị
+y_bar - Giá trị cần tìm
+eps - Độ chính xác
+
+Output:
+st, ed - Chỉ số bắt đầu và kết thúc (hoặc -1, -1 nếu không tìm thấy)
+
+Bước 1: Khởi tạo
+    n = len(y_all)
+    if n < 2: return -1, -1
+    cs = 0
+    tr = 0
+    if y_all[1] - y_all[0] > eps: tr = 1
+    else if y_all[1] - y_all[0] < -eps: tr = -1
+
+Bước 2: Duyệt mảng tìm khoảng
+    for i = 1 to n-1:
+        ntr = 0
+        if y_all[i] - y_all[i-1] > eps: ntr = 1
+        else if y_all[i] - y_all[i-1] < -eps: ntr = -1
+        if ntr != tr or i == n-1:
+            ce = i-1
+            if i == n-1: ce = i
+            ymin = min(y_all[cs], y_all[ce])
+            ymax = max(y_all[cs], y_all[ce])
+            if y_bar >= ymin - eps and y_bar <= ymax + eps:
+                return cs, ce
+            cs = i-1
+            tr = ntr
+
+Bước 3: Return
+    return -1, -1
+
+Thuật toán phụ trợ 2: TrchMoc(x_seg, y_seg, k, y_bar)
+
+Input:
+x_seg[], y_seg[] - Mảng trong khoảng
+k - Số mốc cần trích xuất
+y_bar - Giá trị cần căn giữa
+
+Output:
+x_k[], y_k[] - Mảng trích xuất
+
+Bước 1: Kiểm tra
+    n_seg = len(y_seg)
+    if k >= n_seg: return x_seg, y_seg
+
+Bước 2: Tìm chỉ số gần nhất
+    ic = 0
+    dmin = abs(y_seg[0] - y_bar)
+    for i = 1 to n_seg - 1:
+        d = abs(y_seg[i] - y_bar)
+        if d < dmin:
+            dmin = d
+            ic = i
+
+Bước 3: Xác định khoảng trích xuất
+    ist = ic - floor(k / 2)
+    if ist < 0: ist = 0
+    ied = ist + k - 1
+    if ied > n_seg - 1:
+        ied = n_seg - 1
+        ist = ied - (k - 1)
+    if ist < 0: ist = 0
+
+Bước 4: Return
+    return x_seg[ist ... ied], y_seg[ist ... ied]
+
+Thuật toán phụ trợ 3: SPh(y)
+
+Input:
+y[] - Mảng n giá trị
+
+Output:
+D[] - Mảng sai phân [Δ⁰ y₀, Δ¹ y₀, ..., Δⁿ⁻¹ y₀]
+
+Bước 1: Khởi tạo
+    n = len(y)
+    tmp = copy(y)
+    D = new array[n]
+
+Bước 2: Tính bảng sai phân
+    for i = 0 to n-1:
+        D[i] = tmp[0]
+        for j = 0 to n - 2 - i:
+            tmp[j] = tmp[j+1] - tmp[j]
+
+Bước 3: Return D[]
+
+Thuật toán phụ trợ 4: TnhGt(t, D, m)
+
+Input:
+t - Giá trị t hiện tại
+D[] - Mảng sai phân
+m - Số điểm dữ liệu
+
+Output:
+gt - Giá trị của g(t) = Σ(i=2 đến m-1) [Δⁱ(y₀)/i!] * t(t-1)...(t-i+1)
+
+Bước 1: Khởi tạo
+    gt = 0
+    if m <= 2: return 0 (Không có số hạng bậc cao)
+    fc = 2 (Giai thừa của i=2)
+    tp = t * (t - 1) (Tích t(t-1))
+    gt = gt + (D[2] / 2) * tp (Tính số hạng bậc 2)
+
+Bước 2: Vòng lặp tính các số hạng bậc cao (i = 3 đến m-1)
+    for i = 3 to m - 1:
+        tp = tp * (t - (i - 1))
+        fc = fc * i
+        gt = gt + (D[i] / fc) * tp
+    return gt
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản (mảng 1 chiều, vòng lặp, hàm floor)

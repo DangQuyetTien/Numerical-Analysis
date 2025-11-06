@@ -1,0 +1,20 @@
+THUẬT TOÁN TÍNH GIÁ TRỊ ĐA THỨC tại c
+
+Input: mảng a[] chứa hệ số của đa thức (bậc cao -> bậc thấp), c ( a[0] là hệ số của x^n )
+Output: p: Giá trị đa thức P(c)
+
+Bước 1: Khởi tạo:
+	n = len(a[]) - 1
+	If n = 0: return a[0]
+	p = a[0]
+
+Bước 2: Thực hiện thuật toán:
+	For i = 1 to n:
+		p = p * c + a[i]
+
+Bước 3: Return p
+
+
+Các package được sử dụng: không yêu cầu package ngoài, chỉ sử dụng mảng và toán tử số học cơ bản.
+
+

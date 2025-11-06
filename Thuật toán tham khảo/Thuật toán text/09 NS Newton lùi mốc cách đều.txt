@@ -1,0 +1,111 @@
+Nội suy Newton Lùi - Mốc Cách Đều
+
+Input:
+x[] - Mảng chứa n giá trị mốc x_i (phải cách đều)
+y[] - Mảng chứa n giá trị y_i tương ứng
+
+Output:
+a[] - Mảng hệ số (bậc n-1) của P(x) từ bậc cao đến bậc thấp
+
+Bước 1: Khởi tạo
+    n = len(x)
+	Check Input:
+		if n == 0: return [] (Hoặc LỖI tùy quy ước).
+		if n == 1: return y[] (Đa thức bậc 0).
+		if len(y[]) != n: return LỖI: "Độ dài x và y không khớp"
+	
+	
+		Check Mốc trùng (và Sắp xếp):
+		Giả định x[] đã được sắp xếp tăng dần. Nếu chưa, bạn phải sắp xếp x và y đồng thời.
+		epsilon = 10^(-6)
+		For i = 0 to n-2:
+			if abs(x[i+1] - x[i]) < epsilon:
+				return LỖI: "Dữ liệu có mốc trùng"
+	
+		Check Mốc cách đều (với n > 2):
+		h = x[1] - x[0]
+		For i = 2 to n-1:
+			h_new = x[i] - x[i-1]
+			if abs(h_new - h) > epsilon:
+				return LỖI: "Các mốc không cách đều"
+
+    a[] chứa n số 0
+    W[] = [1]
+
+Bước 2: Tính bảng sai phân lùi
+    D_b = SaiPhanLui(y[])
+
+Bước 3: Vòng lặp xây dựng
+    for i = 0 to n-1: 
+        h_pow = h^i
+        c = D_b[i] / (giai_thua(i) * h_pow)
+        k = len(W[])
+        for j = 0 to k-1:
+            a[n - k + j] = a[n - k + j] + c * W[j]
+        if i < n-1:
+            W[] = nhandathuc(W[], x[n - 1 - i])
+
+Bước 4: Return a[]
+
+Thuật toán phụ trợ 1: SaiPhanLui(y[])
+
+Input:
+y[] - Mảng các giá trị [y_0, y_1, ..., y_{n-1}]
+
+Output:
+D_b[] - Mảng chứa [∇^0 (y_{n-1}), ∇^1 (y_{n-1}), ..., ∇^{n-1} (y_{n-1})]
+
+Bước 1: Khởi tạo
+    n = len(y[])
+    temp[] = copy(y[])  // Tạo mảng temp[] và copy y[]
+    D_b[] có kích thước n
+    D_b[0] = temp[n-1]
+
+Bước 2: Tính bảng sai phân
+    for k = 1 to n-1:
+        for j = n-1 downto k:
+            temp[j] = temp[j] - temp[j-1]
+        D_b[k] = temp[n-1]
+
+Bước 3: Return D_b[]
+
+Thuật toán phụ trợ 2: nhandathuc(p[], c)
+
+Input:
+p[] - Mảng hệ số của P(x) (bậc m) từ bậc cao đến bậc thấp
+c - Hằng số
+
+Output:
+b[] - Mảng hệ số của Q(x) = P(x)·(x-c) (bậc m+1)
+
+Bước 1: Khởi tạo
+    m = len(p[]) - 1
+    b[] chứa m+2 số 0
+    b[0] = p[0]
+    b[m+1] = -p[m] * c
+
+Bước 2: Lặp tính hệ số trung gian
+    for j = 1 to m:
+        b[j] = p[j] - p[j-1] * c
+
+Bước 3: Return b[]
+
+Thuật toán phụ trợ 3: giai_thua(k)
+
+Input:
+k - Số cần tính giai thừa
+
+Output:
+f - Giá trị k!
+
+Bước 1: Kiểm tra điều kiện cơ sở
+    if k == 0: return 1
+
+Bước 2: Tính giai thừa
+    f = 1
+    for i = 1 to k:
+        f = f * i
+
+Bước 3: Return f
+
+Gói sử dụng: Không cần thư viện ngoài, sử dụng các phép toán và cấu trúc dữ liệu cơ bản

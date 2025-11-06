@@ -1,0 +1,219 @@
+Bình phương Tối thiểu cho Hàm Phi tuyến - Tuyến tính hóa & Giải
+
+Bước tiên đề: Khái niệm tuyến tính hóa (Linearization)
+Các hàm phi tuyến cần được biến đổi thành dạng tuyến tính để áp dụng BP tối thiểu.
+Phương pháp: Thường dùng logarit tự nhiên (ln) hoặc các biến đổi khác phù hợp.
+
+═══════════════════════════════════════════════════════════════
+
+PHẦN A: HÀM MŨ TỔNG QUÁT y = a·exp(b₁·φ₁(x) + b₂·φ₂(x))
+
+Mục tiêu: Tìm hệ số a, b₁, b₂ (với xử lý dữ liệu âm/hỗn hợp)
+
+Bước 1: Kiểm tra dấu của Y (PRE-CHECK)
+    Input: X[], Y[], phi1_func, phi2_func
+    n = len(X)
+    if n != len(Y): return LỖI (Độ dài X, Y không khớp)
+    // Kiểm tra dấu của tất cả phần tử Y
+    has_positive = False
+    has_negative = False
+    has_zero = False
+    for i = 0 to n-1:
+        if Y[i] > 0: has_positive = True
+        if Y[i] < 0: has_negative = True
+        if Y[i] == 0: has_zero = True
+    // Kiểm tra hỗn hợp
+    if has_positive and has_negative:
+        return LỖI ("Dữ liệu hỗn hợp (vừa có y>0 vừa có y<0): không phù hợp hàm mũ đơn")
+    if has_zero:
+        return LỖI ("Dữ liệu chứa y=0: không thể lấy logarit")
+
+Bước 2: Tiền xử lý (Chuyển đổi dữ liệu)
+    Y_ln = new array[n]
+    sign_a = (Y[0] > 0) ? 1 : -1  // Xác định dấu của a từ dữ liệu ( sign_a = 1 nếu Y dương, sign_a = - 1 nếu Y âm )
+    for i = 0 to n-1:
+        Y_ln[i] = ln(|Y[i]|)
+
+Bước 3: Định nghĩa hàm cơ sở
+    psi_funcs = [lambda x: 1, phi1_func, phi2_func]
+
+Bước 4: Gọi thuật toán BP tối thiểu
+    coeffs, mse_linear = BinhPhuongToiThieu(X, Y_ln, psi_funcs)
+    if coeffs == LỖI: return LỖI
+
+Bước 5: Hậu xử lý (Giải ngược + xử lý dấu)
+    A = coeffs[0]
+    b1 = coeffs[1]
+    b2 = coeffs[2]
+    a_abs = exp(A)
+    a = sign_a * a_abs  // Áp dụng dấu
+
+Output: a, b1, b2, mse_linear
+
+═══════════════════════════════════════════════════════════════
+
+PHẦN B: HÀM LŨY THỪA y = a·x^b
+
+Mục tiêu: Tìm hệ số a, b (với xử lý dữ liệu âm/hỗn hợp)
+
+Bước 1: Kiểm tra dấu của Y (PRE-CHECK)
+    Input: X[], Y[]
+    n = len(X)
+    if n != len(Y): return LỖI (Độ dài X, Y không khớp)
+    // Kiểm tra dấu của tất cả phần tử Y
+    has_positive = False
+    has_negative = False
+    has_zero = False
+    for i = 0 to n-1:
+        if Y[i] > 0: has_positive = True
+        if Y[i] < 0: has_negative = True
+        if Y[i] == 0: has_zero = True
+    // Kiểm tra hỗn hợp
+    if has_positive and has_negative:
+        return LỖI ("Dữ liệu hỗn hợp (vừa có y>0 vừa có y<0): không phù hợp hàm lũy thừa đơn")
+    if has_zero:
+        return LỖI ("Dữ liệu chứa y=0: không thể lấy logarit")
+
+Bước 2: Kiểm tra X (X phải dương cho hàm lũy thừa)
+    for i = 0 to n-1:
+        if X[i] <= 0: return LỖI ("X phải dương để lấy logarit")
+
+Bước 3: Tiền xử lý (Chuyển đổi dữ liệu)
+    X_ln = new array[n]
+    Y_ln = new array[n]
+    sign_a = (Y[0] > 0) ? 1 : -1  // Xác định dấu của a từ dữ liệu
+    for i = 0 to n-1:
+        X_ln[i] = ln(X[i])
+        Y_ln[i] = ln(|Y[i]|)
+
+Bước 4: Định nghĩa hàm cơ sở
+    psi_funcs = [lambda x_new: 1, lambda x_new: x_new]
+
+Bước 5: Gọi thuật toán BP tối thiểu
+    coeffs, mse_linear = BinhPhuongToiThieu(X_ln, Y_ln, psi_funcs)
+    if coeffs == LỖI: return LỖI
+
+Bước 6: Hậu xử lý (Giải ngược + xử lý dấu)
+    A = coeffs[0]
+    b = coeffs[1]
+    a_abs = exp(A)
+    a = sign_a * a_abs  // Áp dụng dấu
+
+Output: a, b, mse_linear
+
+═══════════════════════════════════════════════════════════════
+
+BẢNG TÓM TẮT - XỬ LÝ CÁC TRƯỜNG HỢP
+
+| Trường hợp | Xử lý | Kết quả |
+|-----------|-------|--------|
+| Tất cả y > 0 | ln(y) trực tiếp | a > 0, thành công |
+| Tất cả y < 0 | ln(\|y\|), sau đó a = -exp(A) | a < 0, thành công |
+| Hỗn hợp (y>0 và y<0) | Báo LỖI | Không phù hợp hàm đơn |
+| y chứa 0 | Báo LỖI | Không thể lấy ln |
+| X chứa ≤0 (hàm lũy thừa) | Báo LỖI | Không thể lấy ln(x) |
+
+═══════════════════════════════════════════════════════════════
+
+THUẬT TOÁN PHỤ TRỢ 1: BinhPhuongToiThieu(X, Y, PhiFuncs)
+
+(Giữ nguyên từ bài trước)
+
+Input:
+mang X[] - n giá trị x_i (có thể đã biến đổi như ln(x))
+mang Y[] - n giá trị y_i (có thể đã biến đổi như ln(|y|))
+mang PhiFuncs[] - m hàm cơ sở
+
+Output:
+mang a[] - m hệ số tối ưu
+mse - sai số trung bình phương
+
+Bước 1: Kiểm tra input
+    n = len(X)
+    m = len(PhiFuncs)
+    if n != len(Y): return LỖI, LỖI
+    if n < m: return LỖI, LỖI
+
+Bước 2: Xây dựng ma trận Φ (n × m)
+    mang Phi[][] có kích thước n × m
+    for i = 0 to n-1:
+        for j = 0 to m-1:
+            Phi[i][j] = PhiFuncs[j](X[i])
+
+Bước 3: Xây dựng hệ chính tắc A·a = b
+    mang A[][] có kích thước m × m số 0
+    for j = 0 to m-1:
+        for k = 0 to m-1:
+            sum_A = 0
+            for i = 0 to n-1:
+                sum_A = sum_A + Phi[i][j] * Phi[i][k]
+            A[j][k] = sum_A
+    mang b[] có kích thước m số 0
+    for j = 0 to m-1:
+        sum_b = 0
+        for i = 0 to n-1:
+            sum_b = sum_b + Phi[i][j] * Y[i]
+        b[j] = sum_b
+
+Bước 4: Giải hệ A·a = b
+    a = GiaiHeDaiSoTuyenTinh(A, b)
+    if a == LỖI: return LỖI, LỖI
+
+Bước 5: Tính sai số MSE
+    total_error_sq = 0
+    for i = 0 to n-1:
+        g_i = 0
+        for j = 0 to m-1:
+            g_i = g_i + a[j] * Phi[i][j]
+        error_i = g_i - Y[i]
+        total_error_sq = total_error_sq + error_i * error_i
+    mse = total_error_sq / n
+
+Bước 6: Return a[], mse
+
+═══════════════════════════════════════════════════════════════
+
+THUẬT TOÁN PHỤ TRỢ 2: GiaiHeDaiSoTuyenTinh(A, D)
+
+(Giữ nguyên từ bài trước - Khử Gauss với Pivoting)
+
+═══════════════════════════════════════════════════════════════
+
+VÍ DỤ SỬ DỤNG
+
+Ví dụ 1: Dữ liệu tất cả âm
+Y = [-1.5, -2.3, -3.8]
+a, b, mse = HamLuyThua(X, Y)
+// Kết quả: a < 0, b dương
+
+Ví dụ 2: Dữ liệu hỗn hợp (SAI)
+Y = [1.5, -2.3, 3.8]
+a, b, mse = HamLuyThua(X, Y)
+// Kết quả: LỖI ("Dữ liệu hỗn hợp...")
+
+═══════════════════════════════════════════════════════════════
+
+LƯU Ý QUAN TRỌNG
+
+✅ Kiểm tra trước (Pre-check):
+   - Phải kiểm tra dấu của Y trước khi xử lý
+   - Báo lỗi ngay nếu dữ liệu hỗn hợp
+   - Báo lỗi nếu Y chứa 0
+
+✅ Xử lý dữ liệu âm:
+   - Lấy giá trị tuyệt đối: Y_ln = ln(|Y|)
+   - Lưu dấu: sign_a = (Y[0] > 0) ? 1 : -1
+   - Áp dụng dấu vào hệ số: a = sign_a * exp(A)
+
+✅ Tại sao báo lỗi hỗn hợp:
+   - Hàm y = a·e^(bx) với a > 0 luôn y > 0
+   - Hàm y = a·e^(bx) với a < 0 luôn y < 0
+   - Không thể có y vừa > 0 vừa < 0 với một hàm đơn
+   - Nếu dữ liệu hỗn hợp: cần mô hình khác hoặc tách thành 2 phần
+
+⚠️ Điều kiện thành công:
+   - Dữ liệu phải cùng dấu (all > 0 hoặc all < 0)
+   - Không được có y = 0
+   - X > 0 (cho hàm lũy thừa)
+
+Gói sử dụng: Không cần thư viện ngoài (exp, ln, cơ bản)
